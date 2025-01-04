@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import csv
 import os
 from flask import Flask, request, jsonify, send_file, url_for
@@ -6,6 +7,8 @@ import openai
 import nltk
 from nltk.corpus import cmudict
 import string
+
+load_dotenv()
 
 # Load CMU Pronouncing Dictionary
 nltk.download("cmudict")
