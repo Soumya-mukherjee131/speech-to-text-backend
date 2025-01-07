@@ -7,6 +7,7 @@ import openai
 import nltk
 from nltk.corpus import cmudict
 import string
+from gtts import gTTS
 
 load_dotenv()
 
@@ -126,7 +127,28 @@ def download_file(filename):
 
 @app.route('/', methods=['GET'])
 def home():
-    return "Welcome to the Speech Enhancer App API. Use /process-audio to process audio files."
+    return "Welcome to the Speech Enhancer App API. Use /process-audio to process audio files.The backend is running perfectly."
+
+@app.route('/generate-audio', methods=['POST'])
+def generate_audio():
+    """Endpoint to generate audio from enhanced text."""
+    data = request.json
+    text = data.get('text', '')
+
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
+
+    try:
+        # Use gTTS to generate speech
+        tts = gTTS(text=text, lang='en')
+        audio_filename = "enhanced_audio.mp3"
+        audio_filepath = os.path.join(UPLOAD_FOLDER, audio_filename)
+        tts.save(audio_filepath)
+
+        return send_file(audio_filepath, as_attachment=True, download_name=audio_filename)
+    except Exception as e:
+        print(f"Error during audio generation: {str(e)}")
+        return jsonify({"error": f"Failed to generate audio: {str(e)}"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
